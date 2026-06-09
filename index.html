@@ -391,7 +391,7 @@ input::placeholder{color:var(--text-3);}
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-list"></i> Stock Inventory</div>
-        <div class="search-wrap" style="margin-bottom:14px;"><i class="ti ti-search"></i><input type="text" id="admin-search" placeholder="Search materials..." oninput="renderAdminList()"></div>
+        <div class="search-wrap" style="margin-bottom:14px;"><i class="ti ti-search"></i><input type="text" id="admin-search" placeholder="Search materials..." oninput="stockFilter=null;renderAdminStats();renderAdminList()"></div>
         <div id="admin-list" class="mat-list"></div>
       </div>
       <div class="card">
@@ -481,7 +481,7 @@ async function uploadPhoto(file, matId) {
 }
 
 // ── STATE ──
-var materials = [], transactions = [], staffList = [], allocations = [], activeStaff = '', activeJob = '', editingId = null, currentQRId = null;
+var materials = [], transactions = [], staffList = [], allocations = [], activeStaff = '', activeJob = '', editingId = null, currentQRId = null, stockFilter = null;
 
 // ── SEED DATA ──
 var SEED_MATERIALS = [{"id":"Mmpm1befpBCN","name":"Compression Trim","sku":"CP-4L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0},{"hex":"#c4c4c4","name":"Zinc","qty":0}],"createdAt":1779763635925},{"id":"Mmpm1owpwVTM","name":"Facia Cover","sku":"FC-6L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0}],"createdAt":1779764266148},{"id":"Mmpm1o5tiV9A","name":"Nailing Strip","sku":"NS-4L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0}],"createdAt":1779764231286}];
@@ -789,7 +789,20 @@ function renderAdminStats() {
     var t=trackedQty(m);
     if(t===0) out++; else if(t<=m.threshold) low++;
   });
-  document.getElementById('admin-stats').innerHTML='<div class="stat"><div class="stat-n green">'+total+'</div><div class="stat-l">Materials</div></div><div class="stat"><div class="stat-n warn">'+low+'</div><div class="stat-l">Low stock</div></div><div class="stat"><div class="stat-n red">'+out+'</div><div class="stat-l">Out of stock</div></div>';
+  var lowActive = stockFilter==='low' ? 'outline:3px solid var(--warning);' : '';
+  var outActive = stockFilter==='out' ? 'outline:3px solid var(--danger);' : '';
+  var allActive = stockFilter===null ? 'outline:3px solid var(--green);' : '';
+  document.getElementById('admin-stats').innerHTML=
+    '<div class="stat" style="cursor:pointer;'+allActive+'" onclick="setStockFilter(null)" title="Show all"><div class="stat-n green">'+total+'</div><div class="stat-l">Materials</div></div>'+
+    '<div class="stat" style="cursor:pointer;'+lowActive+'" onclick="setStockFilter(\'low\')" title="Show low stock"><div class="stat-n warn">'+low+'</div><div class="stat-l">Low stock</div></div>'+
+    '<div class="stat" style="cursor:pointer;'+outActive+'" onclick="setStockFilter(\'out\')" title="Show out of stock"><div class="stat-n red">'+out+'</div><div class="stat-l">Out of stock</div></div>';
+}
+
+function setStockFilter(f) {
+  stockFilter = stockFilter === f ? null : f;
+  document.getElementById('admin-search').value = '';
+  renderAdminStats();
+  renderAdminList();
 }
 
 function getFilteredMaterials(searchId) {
@@ -827,8 +840,10 @@ function stopAutoScroll() {
 function renderAdminList() {
   var el = document.getElementById('admin-list');
   var list = getFilteredMaterials('admin-search');
-  if (!list.length) { el.innerHTML = '<div class="no-items">No materials found.</div>'; return; }
-  var searching = (document.getElementById('admin-search').value || '').trim().length > 0;
+  if (stockFilter === 'low') list = list.filter(function(m){ var t=trackedQty(m); return t>0 && t<=m.threshold; });
+  if (stockFilter === 'out') list = list.filter(function(m){ return m.colors.some(function(c){return c.tracked!==false;}) && trackedQty(m)===0; });
+  if (!list.length) { el.innerHTML = '<div class="no-items">'+(stockFilter?'No materials match this filter.':'No materials found.')+'</div>'; return; }
+  var searching = (document.getElementById('admin-search').value || '').trim().length > 0 || stockFilter !== null;
   var h = '';
   list.forEach(function(m) {
     h += '<div class="mat-item" draggable="' + (!searching) + '" data-id="'+m.id+'" style="' + (!searching ? 'cursor:grab;' : '') + '">' +
