@@ -689,25 +689,28 @@ function previewPhoto(input, previewId) {
 }
 
 // ── COLOUR ROWS ──
-function addColorRow(cid, hex, name, qty) {
+function addColorRow(cid, hex, name, qty, tracked) {
   hex = hex || '#888888'; name = name || ''; qty = qty || 0;
+  tracked = tracked !== false; // default true
   var div = document.createElement('div'); div.className = 'color-row';
-  div.innerHTML = '<input type="color" value="' + hex + '" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" placeholder="Colour name" value="' + name + '" style="flex:1;"><input type="number" min="0" value="' + qty + '" style="width:70px;"><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button>';
+  div.innerHTML = '<input type="color" value="' + hex + '" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" placeholder="Colour name" value="' + name + '" style="flex:1;"><input type="number" min="0" value="' + qty + '" style="width:70px;"><label style="display:flex;align-items:center;gap:4px;font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-2);cursor:pointer;white-space:nowrap;margin:0;flex-shrink:0;"><input type="checkbox" class="track-toggle"' + (tracked?' checked':'') + ' style="width:auto;padding:0;border:none;box-shadow:none;margin:0;cursor:pointer;"> Track</label><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button>';
   document.getElementById(cid).appendChild(div);
 }
 
 function getColorRows(cid) {
   return Array.from(document.querySelectorAll('#' + cid + ' .color-row')).map(function(row) {
     var i = row.querySelectorAll('input');
-    return { hex: i[0].value, name: i[1].value.trim(), qty: parseInt(i[2].value) || 0 };
+    var trackEl = row.querySelector('.track-toggle');
+    return { hex: i[0].value, name: i[1].value.trim(), qty: parseInt(i[2].value) || 0, tracked: trackEl ? trackEl.checked : true };
   }).filter(function(c) { return c.name; });
 }
 
 // ── MATERIALS ──
 function genId() { return 'M' + Date.now().toString(36) + Math.random().toString(36).slice(2,5).toUpperCase(); }
 function totalQty(m) { return m.colors.reduce(function(s,c){ return s+c.qty; }, 0); }
-function stockClass(m) { var t=totalQty(m); return t===0?'pill-zero':t<=m.threshold?'pill-low':'pill-ok'; }
-function stockLabel(m) { var t=totalQty(m); return t===0?'Out of stock':t<=m.threshold?'Low — '+t+' left':t+' in stock'; }
+function trackedQty(m) { return m.colors.filter(function(c){ return c.tracked !== false; }).reduce(function(s,c){ return s+c.qty; }, 0); }
+function stockClass(m) { var t=trackedQty(m); var hasTracked=m.colors.some(function(c){return c.tracked!==false;}); if(!hasTracked) return 'pill-ok'; return t===0?'pill-zero':t<=m.threshold?'pill-low':'pill-ok'; }
+function stockLabel(m) { var t=trackedQty(m); var tot=totalQty(m); var hasTracked=m.colors.some(function(c){return c.tracked!==false;}); if(!hasTracked) return tot+' in stock'; return t===0?'Out of stock':t<=m.threshold?'Low — '+t+' left':t+' in stock'; }
 function fmtDate(ts) { var d=new Date(ts); return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}); }
 
 async function addMaterial() {
@@ -780,7 +783,12 @@ function render() {
 
 function renderAdminStats() {
   var total=materials.length, low=0, out=0;
-  materials.forEach(function(m){ var t=totalQty(m); if(t===0)out++; else if(t<=m.threshold)low++; });
+  materials.forEach(function(m){
+    var hasTracked = m.colors.some(function(c){ return c.tracked !== false; });
+    if (!hasTracked) return;
+    var t=trackedQty(m);
+    if(t===0) out++; else if(t<=m.threshold) low++;
+  });
   document.getElementById('admin-stats').innerHTML='<div class="stat"><div class="stat-n green">'+total+'</div><div class="stat-l">Materials</div></div><div class="stat"><div class="stat-n warn">'+low+'</div><div class="stat-l">Low stock</div></div><div class="stat"><div class="stat-n red">'+out+'</div><div class="stat-l">Out of stock</div></div>';
 }
 
@@ -1127,7 +1135,8 @@ function showEdit(id, isClone) {
   editingId = id;
   document.getElementById('edit-title').innerHTML = isClone ? '<i class="ti ti-copy" style="color:var(--blue)"></i> Edit Duplicated Material' : '<i class="ti ti-edit" style="color:var(--blue)"></i> Edit Material';
   var colorRows = m.colors.map(function(c) {
-    return '<div class="color-row"><input type="color" value="'+c.hex+'" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" value="'+c.name+'" placeholder="Colour name" style="flex:1;"><input type="number" min="0" value="'+c.qty+'" style="width:70px;"><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button></div>';
+    var tracked = c.tracked !== false;
+    return '<div class="color-row"><input type="color" value="'+c.hex+'" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" value="'+c.name+'" placeholder="Colour name" style="flex:1;"><input type="number" min="0" value="'+c.qty+'" style="width:70px;"><label style="display:flex;align-items:center;gap:4px;font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-2);cursor:pointer;white-space:nowrap;margin:0;flex-shrink:0;"><input type="checkbox" class="track-toggle"'+(tracked?' checked':'')+' style="width:auto;padding:0;border:none;box-shadow:none;margin:0;cursor:pointer;"> Track</label><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button></div>';
   }).join('');
   var photoPreviewHtml = m.photo ? '<img src="'+m.photo+'" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block;">' : '';
   document.getElementById('modal-edit-content').innerHTML =
