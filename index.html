@@ -1,154 +1,1303 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JSJ Roofing — Stock Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+:root {
+  --green: #a2c354;
+  --green-dark: #91b343;
+  --green-darker: #82a33a;
+  --green-bg: #f4f8ea;
+  --blue: #0654a6;
+  --cyan: #0088cf;
+  --dark-blue: #082b51;
+  --black: #231f20;
+  --white: #ffffff;
+  --surface: #f7f8f5;
+  --surface-2: #eef0e8;
+  --text: #231f20;
+  --text-2: #5a5a5a;
+  --text-3: #8a8a8a;
+  --success: #a2c354;
+  --success-bg: #f4f8ea;
+  --warning: #e8a317;
+  --warning-bg: #fef7e6;
+  --danger: #d63031;
+  --danger-bg: #fdeaea;
+  --info: #0088cf;
+  --info-bg: #e6f4fb;
+  --border: #e2e4dc;
+  --border-med: #c5c8bc;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+  --shadow-1: 0 1px 3px rgba(35,31,32,0.06);
+  --shadow-2: 0 4px 12px rgba(35,31,32,0.08);
+  --shadow-3: 0 8px 24px rgba(35,31,32,0.12);
+  --shadow-4: 0 16px 48px rgba(35,31,32,0.16);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;font-size:16px;line-height:1.5;}
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+/* ── HEADER ── */
+.header{background:var(--dark-blue);padding:0 20px;display:flex;align-items:center;gap:16px;height:68px;box-shadow:var(--shadow-3);position:sticky;top:0;z-index:100;}
+.logo-wrap{display:flex;align-items:center;gap:12px;}
+.logo-img{height:44px;width:auto;}
+.logo-divider{width:1px;height:32px;background:rgba(255,255,255,0.15);}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);letter-spacing:0.5px;line-height:1.2;}
+.logo-sub{font-size:11px;font-weight:600;color:var(--green);letter-spacing:1px;text-transform:uppercase;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+/* ── APP WRAP ── */
+.app{max-width:720px;margin:0 auto;padding:20px 16px 60px;}
+
+/* ── STAFF LOGIN ── */
+.staff-screen{text-align:center;padding:48px 20px 32px;}
+.staff-screen h2{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--dark-blue);margin-bottom:6px;letter-spacing:-0.3px;}
+.staff-screen p{color:var(--text-2);font-size:15px;margin-bottom:28px;}
+.staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:420px;margin:0 auto 28px;}
+.staff-btn{padding:16px 14px;border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--white);cursor:pointer;font-size:15px;font-weight:600;color:var(--text);font-family:'Barlow',sans-serif;transition:all 0.18s;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-1);}
+.staff-btn:hover{border-color:var(--green);background:var(--green-bg);color:var(--dark-blue);box-shadow:var(--shadow-2);transform:translateY(-1px);}
+.staff-btn i{font-size:20px;color:var(--text-3);}
+.staff-btn:hover i{color:var(--green-dark);}
+
+/* ── STAFF BANNER ── */
+.staff-banner{background:var(--dark-blue);border-radius:var(--radius-lg);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.staff-banner .name{color:white;font-weight:700;font-size:15px;}
+.staff-banner .logout-btn{margin-left:auto;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);color:white;border-radius:var(--radius);padding:5px 12px;cursor:pointer;font-size:12px;font-family:'Barlow',sans-serif;font-weight:700;letter-spacing:0.3px;transition:all 0.15s;}
+.staff-banner .logout-btn:hover{background:rgba(255,255,255,0.2);}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:8px;margin-bottom:20px;}
+.tab-btn{flex:1;padding:11px 10px;border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--white);color:var(--text-2);cursor:pointer;font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:var(--shadow-1);}
+.tab-btn.active{background:var(--dark-blue);color:white;border-color:var(--dark-blue);box-shadow:var(--shadow-2);}
+.tab-btn.active i{color:var(--green);}
+.tab-btn:hover:not(.active){background:var(--green-bg);border-color:var(--green);color:var(--dark-blue);}
+.view{display:none;}.view.active{display:block;}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:18px;}
+.search-wrap input{padding-left:40px;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-1);}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--text-2);margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:12px;}
+.card-title i{color:var(--green);font-size:16px;}
+
+/* ── FORMS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-row.full{grid-template-columns:1fr;}
+label{font-size:12px;color:var(--text);display:block;margin-bottom:5px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;}
+input,select{width:100%;padding:10px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text);font-family:'Barlow',sans-serif;transition:border-color 0.15s,box-shadow 0.15s;}
+input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(6,84,166,0.1);}
+input::placeholder{color:var(--text-3);}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 18px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;font-weight:700;color:var(--text-2);font-family:'Barlow',sans-serif;transition:all 0.18s;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-1);}
+.btn:hover{background:var(--surface);transform:translateY(-1px);box-shadow:var(--shadow-2);}
+.btn.primary{background:var(--green);color:var(--dark-blue);border-color:var(--green);}
+.btn.primary:hover{background:var(--green-dark);box-shadow:0 4px 12px rgba(162,195,84,0.35);transform:translateY(-1px);}
+.btn.primary:active{background:var(--green-darker);transform:translateY(0);}
+.btn.success{background:var(--green);color:var(--dark-blue);border-color:var(--green);}
+.btn.success:hover{background:var(--green-dark);}
+.btn.danger{background:var(--danger);color:white;border-color:var(--danger);}
+.btn.danger:hover{background:#c0282a;}
+.btn.clone{background:var(--info-bg);color:var(--cyan);border-color:#b3ddf0;}
+.btn.sm{padding:6px 12px;font-size:12px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* ── MATERIAL LIST ── */
+.mat-list{display:flex;flex-direction:column;gap:10px;}
+.mat-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;transition:all 0.18s;box-shadow:var(--shadow-1);}
+.mat-item:hover{border-color:var(--green);box-shadow:var(--shadow-2);transform:translateY(-1px);}
+.mat-item.drag-over{border-color:var(--green);border-style:dashed;background:var(--green-bg);transform:translateY(-2px);box-shadow:var(--shadow-3);}
+.mat-thumb{width:52px;height:52px;border-radius:var(--radius-lg);object-fit:cover;border:1.5px solid var(--border);flex-shrink:0;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:22px;overflow:hidden;}
+.mat-thumb img{width:100%;height:100%;object-fit:cover;}
+.mat-name{font-size:15px;font-weight:700;color:var(--dark-blue);}
+.mat-meta{font-size:12px;color:var(--text-3);margin-top:2px;font-weight:500;}
+.color-dots{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.cdot{width:20px;height:20px;border-radius:50%;border:2px solid rgba(0,0,0,0.1);position:relative;cursor:pointer;flex-shrink:0;}
+.cdot:hover::after{content:attr(data-tip);position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:var(--dark-blue);color:white;font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;z-index:10;font-family:'Barlow',sans-serif;font-weight:600;}
+.stock-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--radius-full);white-space:nowrap;flex-shrink:0;letter-spacing:0.4px;text-transform:uppercase;}
+.pill-ok{background:var(--success-bg);color:#4a7a1a;}
+.pill-low{background:var(--warning-bg);color:#8a5a00;}
+.pill-zero{background:var(--danger-bg);color:var(--danger);}
+.item-btns{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+
+/* ── JOB BANNER ── */
+.job-banner{background:var(--dark-blue);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;border-left:4px solid var(--green);}
+.job-icon{color:var(--green);font-size:24px;flex-shrink:0;}
+.job-banner strong{color:white;font-size:16px;font-weight:700;}
+.job-banner small{color:rgba(255,255,255,0.6);font-size:12px;display:block;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.job-banner .change-btn{margin-left:auto;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);color:white;border-radius:var(--radius);padding:6px 14px;cursor:pointer;font-size:12px;font-family:'Barlow',sans-serif;font-weight:700;white-space:nowrap;transition:all 0.15s;letter-spacing:0.3px;}
+.job-banner .change-btn:hover{background:rgba(255,255,255,0.2);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.stat{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center;box-shadow:var(--shadow-1);}
+.stat-n{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--dark-blue);letter-spacing:-0.5px;}
+.stat-n.green{color:var(--green-dark);}
+.stat-n.red{color:var(--danger);}
+.stat-n.warn{color:var(--warning);}
+.stat-l{font-size:11px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;}
+
+/* ── COLOUR ROWS ── */
+.color-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.color-row input[type=color]{width:36px;height:36px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;}
+.color-row input[type=text]{flex:1;}
+.color-row input[type=number]{width:72px;}
+.rm-btn{background:none;border:none;color:var(--danger);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;}
+
+/* ── PHOTO UPLOAD ── */
+.photo-upload{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:18px;text-align:center;cursor:pointer;transition:all 0.18s;margin-bottom:10px;}
+.photo-upload:hover{border-color:var(--green);background:var(--green-bg);}
+.photo-upload i{font-size:30px;color:var(--text-3);display:block;margin-bottom:6px;}
+.photo-upload p{font-size:13px;color:var(--text-3);}
+.photo-preview{width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-lg);margin-top:10px;display:none;}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(8,43,81,0.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-4);}
+.modal h2{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--dark-blue);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.modal h2 i{color:var(--green);}
+.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;}
+
+/* ── DETAIL MODAL ── */
+.detail-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--dark-blue);letter-spacing:-0.3px;}
+.detail-sku{font-size:12px;color:var(--text-3);margin:4px 0 16px;font-family:monospace;background:var(--surface);display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);}
+.detail-photo{width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:16px;}
+.cstock-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.cstock-row:last-of-type{border-bottom:none;}
+.cswatch{display:flex;align-items:center;gap:10px;}
+.cswatch-dot{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,0.1);flex-shrink:0;}
+.cname{font-size:14px;font-weight:700;color:var(--text);}
+.cqty-label{font-size:12px;color:var(--text-3);margin-top:1px;}
+.cactions{display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
+.cbtns{display:flex;gap:6px;}
+.qty-row{display:flex;align-items:center;gap:6px;}
+.qty-row label{font-size:11px;margin:0;text-transform:none;}
+.qty-row input{width:60px;padding:5px 8px;font-size:13px;}
+
+/* ── QR ── */
+.qr-print-wrap{text-align:center;}
+.qr-print-wrap .print-photo{width:160px;height:120px;object-fit:cover;border-radius:var(--radius-lg);margin:10px auto;display:block;border:1.5px solid var(--border);}
+#qrcode-container canvas{display:block;margin:0 auto;border-radius:var(--radius-lg);}
+
+/* ── TRANSACTIONS ── */
+.tx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.tx-row:last-child{border-bottom:none;}
+.tx-icon{font-size:18px;flex-shrink:0;}
+.tx-icon.out{color:var(--danger);}
+.tx-icon.in{color:var(--green-dark);}
+.tx-info{flex:1;min-width:0;}
+.tx-mat{font-weight:700;color:var(--dark-blue);}
+.tx-col{color:var(--text-3);}
+.tx-tag{display:inline-block;background:var(--info-bg);color:var(--cyan);font-size:10px;padding:2px 8px;border-radius:var(--radius-full);font-weight:700;margin-top:2px;margin-right:3px;}
+.tx-tag.staff{background:var(--green-bg);color:#4a7a1a;}
+.tx-qty{font-weight:700;white-space:nowrap;}
+.tx-qty.out{color:var(--danger);}
+.tx-qty.in{color:var(--green-dark);}
+.tx-time{font-size:11px;color:var(--text-3);white-space:nowrap;}
+
+/* ── STAFF TAGS ── */
+.staff-tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.staff-tag{display:inline-flex;align-items:center;gap:6px;background:var(--info-bg);color:var(--blue);border-radius:var(--radius-full);padding:5px 12px;font-size:13px;font-weight:700;border:1px solid #b3ddf0;}
+.staff-tag button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:0;line-height:1;}
+
+/* ── MISC ── */
+.no-items{text-align:center;padding:32px;color:var(--text-3);font-size:14px;}
+.hidden{display:none!important;}
+.warn-box{background:var(--warning-bg);border:1px solid #f5cc6a;border-left:4px solid var(--warning);border-radius:var(--radius-lg);padding:12px 14px;font-size:13px;color:#6b4300;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px;}
+.warn-box i{color:var(--warning);flex-shrink:0;margin-top:1px;}
+.info-box{background:var(--info-bg);border:1px solid #90cfe8;border-left:4px solid var(--cyan);border-radius:var(--radius-lg);padding:12px 14px;font-size:13px;color:#004f7a;display:flex;gap:8px;margin-bottom:14px;}
+.info-box i{color:var(--cyan);flex-shrink:0;margin-top:1px;}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+/* ── LOADING ── */
+#loading-overlay{position:fixed;inset:0;background:var(--dark-blue);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+.spinner{width:44px;height:44px;border:4px solid rgba(162,195,84,0.3);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-logo{height:56px;width:auto;opacity:0.95;}
+.loading-text{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:1px;}
+.loading-sub{font-size:13px;color:var(--green);font-weight:600;letter-spacing:0.5px;}
+
+/* ── SYNC ── */
+.sync-indicator{position:fixed;bottom:16px;right:16px;background:var(--dark-blue);color:white;border-radius:var(--radius-full);padding:8px 16px;font-size:12px;font-weight:700;z-index:500;display:none;align-items:center;gap:8px;box-shadow:var(--shadow-3);}
+.sync-indicator.show{display:flex;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* ── ALLOCATIONS ── */
+.alloc-pill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--radius-full);background:#fff3cd;color:#856404;border:1px solid #ffc107;white-space:nowrap;letter-spacing:0.3px;text-transform:uppercase;margin-left:4px;}
+.alloc-banner{background:linear-gradient(135deg,#082b51,#0654a6);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:14px;border-left:4px solid #ffc107;}
+.alloc-banner h3{color:white;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:0.3px;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.alloc-banner h3 i{color:#ffc107;}
+.alloc-banner p{color:rgba(255,255,255,0.7);font-size:13px;}
+.alloc-item{background:var(--white);border:1.5px solid #ffc107;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-1);}
+.alloc-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.alloc-job{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--dark-blue);display:flex;align-items:center;gap:6px;}
+.alloc-job i{color:#e8a317;}
+.alloc-line{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.alloc-line:last-of-type{border-bottom:none;}
+.alloc-line-info{display:flex;align-items:center;gap:8px;}
+.alloc-swatch{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.15);flex-shrink:0;}
+.alloc-qty{font-weight:700;color:var(--dark-blue);font-size:14px;background:var(--warning-bg);padding:2px 8px;border-radius:var(--radius-full);}
+.alloc-note{font-size:12px;color:var(--text-3);font-style:italic;margin-top:4px;}
+.reserved-bar{font-size:11px;color:#856404;background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius-sm);padding:2px 6px;display:inline-flex;align-items:center;gap:3px;margin-top:3px;}
+.qty-avail{font-size:12px;color:var(--text-3);margin-top:2px;}
+.collect-alloc-btn{background:#fff3cd;color:#856404;border:1.5px solid #ffc107;border-radius:var(--radius);padding:5px 12px;cursor:pointer;font-size:12px;font-family:'Barlow',sans-serif;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s;}
+.collect-alloc-btn:hover{background:#ffc107;color:#212529;}
+.alloc-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.alloc-status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--radius-full);text-transform:uppercase;letter-spacing:0.3px;}
+.alloc-status-badge.pending{background:#fff3cd;color:#856404;}
+.alloc-status-badge.partial{background:var(--info-bg);color:var(--blue);}
+.alloc-status-badge.fulfilled{background:var(--success-bg);color:#4a7a1a;}
+
+@media print{
+  .no-print{display:none!important;}
+  .modal-bg{position:static;background:none;backdrop-filter:none;padding:0;}
+  .modal{box-shadow:none;border:none;max-height:none;}
+}
+@media(max-width:480px){
+  .form-row{grid-template-columns:1fr;}
+  .item-btns .btn.sm span{display:none;}
+  .header{padding:0 14px;}
+  .app{padding:16px 12px 60px;}
+}
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <img src="data:image/png;base64,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" class="loading-logo" alt="JSJ Roofing">
+  <div class="spinner"></div>
+  <div class="loading-text">Stock Manager</div>
+  <div class="loading-sub">Connecting to database...</div>
+</div>
+
+<div class="sync-indicator" id="sync-indicator"><div class="sync-dot"></div> Saving...</div>
+
+<div class="header no-print">
+  <div class="logo-wrap">
+    <img src="data:image/png;base64,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" class="logo-img" alt="JSJ Roofing">
+    <div class="logo-divider"></div>
+    <div>
+      <div class="logo-text">JSJ Roofing</div>
+      <div class="logo-sub">Stock Manager</div>
+    </div>
+  </div>
+  <div class="header-right" id="header-staff"></div>
+</div>
+
+<div class="app">
+  <div id="screen-staff">
+    <div class="staff-screen">
+      <h2>Who's Working Today?</h2>
+      <p>Select your name to get started</p>
+      <div class="staff-grid" id="staff-grid"></div>
+      <div style="max-width:420px;margin:0 auto;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="quick-staff-input" placeholder="Add new name...">
+          <button class="btn primary" onclick="quickAddStaff()"><i class="ti ti-plus"></i> Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-main" class="hidden">
+    <div class="tabs no-print">
+      <button class="tab-btn active" onclick="switchView('tradesman')" id="tab-tradesman"><i class="ti ti-qrcode"></i> Tradesman</button>
+      <button class="tab-btn" onclick="switchView('allocations')" id="tab-allocations"><i class="ti ti-clipboard-list"></i> Allocations</button>
+      <button class="tab-btn" onclick="switchView('admin')" id="tab-admin"><i class="ti ti-settings"></i> Admin</button>
+    </div>
+
+    <div class="view active" id="view-tradesman">
+      <div id="job-banner-wrap"></div>
+      <div id="job-set-wrap" class="card">
+        <div class="card-title"><i class="ti ti-briefcase"></i> Set Job Number</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="job-input" placeholder="Enter job number..." style="flex:1;">
+          <button class="btn primary" onclick="setJob()"><i class="ti ti-check"></i> Set</button>
+        </div>
+      </div>
+      <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="tradesman-search" placeholder="Search materials..." oninput="renderTradesmanList()"></div>
+      <div id="tradesman-list" class="mat-list"></div>
+    </div>
+
+    <div class="view" id="view-allocations">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-clipboard-list"></i> Allocate Material to Job</div>
+        <div class="alloc-form-row">
+          <div><label>Job Number *</label><input type="text" id="alloc-job" placeholder="e.g. JSJ-1042"></div>
+          <div><label>Note (optional)</label><input type="text" id="alloc-note" placeholder="e.g. Ridge capping"></div>
+        </div>
+        <div class="alloc-form-row">
+          <div><label>Material *</label>
+            <select id="alloc-material" onchange="populateAllocColours()">
+              <option value="">— Select material —</option>
+            </select>
+          </div>
+          <div><label>Colour *</label>
+            <select id="alloc-colour">
+              <option value="">— Select colour —</option>
+            </select>
+          </div>
+        </div>
+        <div class="alloc-form-row">
+          <div><label>Quantity *</label><input type="number" id="alloc-qty" value="1" min="1"></div>
+          <div style="display:flex;align-items:flex-end;"><button class="btn primary" onclick="addToAllocBatch()" style="width:100%;justify-content:center;"><i class="ti ti-plus"></i> Add to Batch</button></div>
+        </div>
+        <div id="alloc-batch-list" style="margin-top:12px;"></div>
+        <div id="alloc-batch-submit-row" class="hidden" style="margin-top:10px;">
+          <button class="btn primary" onclick="submitAllocBatch()" style="width:100%;justify-content:center;background:var(--green,#1e9e5a);"><i class="ti ti-send"></i> Submit Allocation</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-clock"></i> Pending Allocations</div>
+        <div class="search-wrap" style="margin-bottom:14px;"><i class="ti ti-search"></i><input type="text" id="alloc-search" placeholder="Search job number..." oninput="renderAllocations()"></div>
+        <div id="alloc-list"></div>
+      </div>
+    </div>
+
+    <div class="view" id="view-admin">
+      <div class="stats" id="admin-stats"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-plus"></i> Add New Material</div>
+        <div class="form-row">
+          <div><label>Material name *</label><input type="text" id="new-name" placeholder="e.g. Compression Trim"></div>
+          <div><label>SKU / Code</label><input type="text" id="new-sku" placeholder="e.g. CP-4L/m-Each"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Low stock threshold</label><input type="number" id="new-threshold" value="5" min="0"></div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>Material photo (optional)</label>
+          <div class="photo-upload" onclick="document.getElementById('new-photo-input').click()">
+            <i class="ti ti-camera"></i><p>Tap to take photo or upload image</p>
+            <img id="new-photo-preview" class="photo-preview">
+          </div>
+          <input type="file" id="new-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="previewPhoto(this,'new-photo-preview')">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>Colours &amp; starting quantities</label>
+          <div id="color-entries"></div>
+          <button class="btn sm" id="add-color-new-btn" style="margin-top:8px;"><i class="ti ti-plus"></i> Add colour</button>
+        </div>
+        <div style="margin-top:16px;"><button class="btn primary" onclick="addMaterial()"><i class="ti ti-device-floppy"></i> Save material</button></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-list"></i> Stock Inventory</div>
+        <div class="search-wrap" style="margin-bottom:14px;"><i class="ti ti-search"></i><input type="text" id="admin-search" placeholder="Search materials..." oninput="stockFilter=null;renderAdminStats();renderAdminList()"></div>
+        <div id="admin-list" class="mat-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-history"></i> Recent Transactions</div>
+        <div id="tx-list"></div>
+        <hr class="divider">
+        <button class="btn sm" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-users"></i> Staff</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="new-staff" placeholder="Add staff member..." style="flex:1;">
+          <button class="btn primary" onclick="addStaff()"><i class="ti ti-plus"></i> Add</button>
+        </div>
+        <div class="staff-tag-list" id="staff-tag-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="modal-detail">
+  <div class="modal"><div id="modal-detail-content"></div>
+  <div class="modal-actions no-print"><button class="btn" onclick="closeModal('modal-detail')"><i class="ti ti-x"></i> Close</button></div></div>
+</div>
+<div class="modal-bg hidden" id="modal-edit">
+  <div class="modal">
+    <h2 id="edit-title"><i class="ti ti-edit"></i> Edit Material</h2>
+    <div id="modal-edit-content"></div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="saveEdit()"><i class="ti ti-device-floppy"></i> Save</button>
+      <button class="btn" onclick="closeModal('modal-edit')">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg hidden" id="modal-qr">
+  <div class="modal" style="max-width:340px;">
+    <h2 style="justify-content:center;" id="qr-modal-title"></h2>
+    <div class="qr-print-wrap">
+      <img id="qr-print-photo" class="print-photo hidden" alt="">
+      <div id="qrcode-container" style="margin:12px 0;"></div>
+      <p style="font-size:14px;font-weight:700;color:var(--dark-blue);margin-top:8px;" id="qr-mat-name"></p>
+      <p style="font-size:11px;color:var(--text-3);" id="qr-label"></p>
+    </div>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn primary" onclick="printQR()"><i class="ti ti-printer"></i> Print</button>
+      <button class="btn" onclick="downloadQR()"><i class="ti ti-download"></i> Download</button>
+      <button class="btn no-print" onclick="closeModal('modal-qr')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'https://bvdcstvrvrdnaqwqwghq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_qnNsM-hDuRbWNFg_DNXn1g_q6zJeNX9';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2ZGNzdHZydnJkbmFxd3F3Z2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MTU1OTUsImV4cCI6MjA5NTQ5MTU5NX0.nzaX3PYWR3hq7IEby8S4WZMKC8nE-WsMiuh5v2tg3Fc';
+const HEADERS = { 'Content-Type': 'application/json', 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'x-client-info': 'jsj-stock-manager' };
+
+async function sbFetch(path, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({}, HEADERS, opts.headers || {});
+  const res = await fetch(SUPABASE_URL + path, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Supabase error: ' + err);
   }
-  if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405, headers: corsHeaders });
-  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
 
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
-  const SM8_APP_ID = Deno.env.get("SM8_APP_ID")!;
-  const SM8_APP_SECRET = Deno.env.get("SM8_APP_SECRET")!;
+async function uploadPhoto(file, matId) {
+  // Compress first
+  const compressed = await compressImageFile(file, 600, 0.8);
+  const blob = await fetch(compressed).then(r => r.blob());
+  const ext = 'jpg';
+  const path = matId + '.' + ext;
+  // Delete old first (ignore errors)
+  try { await fetch(SUPABASE_URL + '/storage/v1/object/Photos/' + path, { method: 'DELETE', headers: HEADERS }); } catch(e) {}
+  const res = await fetch(SUPABASE_URL + '/storage/v1/object/Photos/' + path, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
+    body: blob
+  });
+  if (!res.ok) throw new Error('Photo upload failed: ' + await res.text());
+  return SUPABASE_URL + '/storage/v1/object/public/Photos/' + path + '?t=' + Date.now();
+}
 
-  function sbHeaders() {
-    return {
-      "apikey": SERVICE_ROLE_KEY,
-      "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
-      "Content-Type": "application/json",
-    };
-  }
+// ── STATE ──
+var materials = [], transactions = [], staffList = [], allocations = [], activeStaff = '', activeJob = '', editingId = null, currentQRId = null, stockFilter = null;
 
+// ── SEED DATA ──
+var SEED_MATERIALS = [{"id":"Mmpm1befpBCN","name":"Compression Trim","sku":"CP-4L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0},{"hex":"#c4c4c4","name":"Zinc","qty":0}],"createdAt":1779763635925},{"id":"Mmpm1owpwVTM","name":"Facia Cover","sku":"FC-6L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0}],"createdAt":1779764266148},{"id":"Mmpm1o5tiV9A","name":"Nailing Strip","sku":"NS-4L/m-Each","threshold":5,"colors":[{"hex":"#951818","name":"Manor Red","qty":0},{"hex":"#1c632a","name":"Cottage Green","qty":0},{"hex":"#ffffff","name":"Surfmist","qty":0},{"hex":"#f3f095","name":"Classic Cream","qty":0},{"hex":"#030303","name":"Night Sky","qty":0},{"hex":"#797777","name":"Woodland Grey","qty":0},{"hex":"#47464e","name":"Monument","qty":0},{"hex":"#22bf75","name":"Pale Eucalypt","qty":0},{"hex":"#dbe08f","name":"Paperbark","qty":0},{"hex":"#575e7f","name":"Ironstone","qty":0},{"hex":"#433232","name":"Ace Brown","qty":0},{"hex":"#796363","name":"Jasper","qty":0},{"hex":"#25346f","name":"Deep Ocean","qty":0}],"createdAt":1779764231286}];
+
+// ── LOAD / SAVE ──
+async function loadAll() {
+  const [mats, txs, staff, allocs] = await Promise.all([
+    sbFetch('/rest/v1/materials?select=*&order=sort_order.asc,created_at.asc'),
+    sbFetch('/rest/v1/transactions?select=*&order=ts.desc&limit=300'),
+    sbFetch('/rest/v1/staff?select=*'),
+    sbFetch('/rest/v1/allocations?select=*&order=created_at.desc').catch(function(){ return []; })
+  ]);
+  materials = (mats || []).map(function(m) {
+    return { id: m.id, name: m.name, sku: m.sku || '', threshold: m.threshold || 5, colors: m.colors || [], photo: m.photo_url || null, createdAt: m.created_at, sortOrder: m.sort_order || 0 };
+  });
+  transactions = (txs || []).map(function(t) {
+    return { ts: t.ts, matId: t.material_id, matName: t.material_name, colorName: t.color_name, type: t.qty_change < 0 ? 'collect' : 'return', qty: Math.abs(t.qty_change), job: t.job, staff: t.staff };
+  });
+  staffList = (staff || []).map(function(s) { return s.name; });
+  if (!staffList.length) staffList = ['Admin'];
+  allocations = (allocs || []).map(function(a) {
+    return { id: a.id, job: a.job, matId: a.material_id, matName: a.material_name, colorName: a.color_name, colorHex: a.color_hex || '#888888', qty: a.qty, qtyFulfilled: a.qty_fulfilled || 0, note: a.note || '', staff: a.staff || '', createdAt: a.created_at };
+  });
+}
+
+async function saveMaterial(m) {
+  showSync();
+  await sbFetch('/rest/v1/materials', {
+    method: 'POST',
+    headers: { 'Prefer': 'resolution=merge-duplicates' },
+    body: JSON.stringify({ id: m.id, name: m.name, sku: m.sku, threshold: m.threshold, colors: m.colors, photo_url: m.photo, created_at: m.createdAt, sort_order: m.sortOrder || 0 })
+  });
+  hideSync();
+}
+
+async function deleteMaterialDB(id) {
+  showSync();
+  await sbFetch('/rest/v1/materials?id=eq.' + id, { method: 'DELETE' });
+  // Also delete photo
+  try { await fetch(SUPABASE_URL + '/storage/v1/object/Photos/' + id + '.jpg', { method: 'DELETE', headers: HEADERS }); } catch(e) {}
+  hideSync();
+}
+
+async function saveTransaction(tx) {
+  showSync();
+  await sbFetch('/rest/v1/transactions', {
+    method: 'POST',
+    body: JSON.stringify({ id: tx.id, material_id: tx.matId, material_name: tx.matName, color_name: tx.colorName, qty_change: tx.type === 'collect' ? -tx.qty : tx.qty, staff: tx.staff, job: tx.job, ts: tx.ts })
+  });
+  hideSync();
+}
+
+async function saveStaff(name) {
+  showSync();
+  await sbFetch('/rest/v1/staff', { method: 'POST', headers: { 'Prefer': 'resolution=ignore-duplicates' }, body: JSON.stringify({ name: name }) });
+  hideSync();
+}
+
+async function deleteStaffDB(name) {
+  showSync();
+  await sbFetch('/rest/v1/staff?name=eq.' + encodeURIComponent(name), { method: 'DELETE' });
+  hideSync();
+}
+
+async function postAllocationBatchNote(jobNumber, lines) {
   try {
-    const body = await req.json();
-    const { jobNumber, lines } = body;
-    // lines: array of strings, e.g. ["📦 12 x Colorbond Corrugated — Surfmist (by Dave)"]
-
-    if (!jobNumber || !Array.isArray(lines) || lines.length === 0) {
-      return new Response(JSON.stringify({ error: "Missing jobNumber or lines[]" }), { status: 400, headers: corsHeaders });
-    }
-
-    // 1. Get ServiceM8 tokens
-    const tokenRowRes = await fetch(`${SUPABASE_URL}/rest/v1/sm8_tokens?id=eq.1&select=*`, {
-      headers: { "apikey": SERVICE_ROLE_KEY, "Authorization": `Bearer ${SERVICE_ROLE_KEY}` },
+    await fetch('https://bvdcstvrvrdnaqwqwghq.supabase.co/functions/v1/rapid-endpoint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobNumber: jobNumber, lines: lines.map(function(l){ return '📦 ' + l; }) })
     });
-    const tokenRows = await tokenRowRes.json();
-    if (!tokenRows.length) {
-      return new Response(JSON.stringify({ error: "No ServiceM8 connection found. Please reconnect." }), { status: 500, headers: corsHeaders });
-    }
-    let { access_token, refresh_token, expires_at } = tokenRows[0];
-
-    // 2. Refresh access token if expired
-    if (new Date(expires_at) <= new Date()) {
-      const refreshRes = await fetch("https://go.servicem8.com/oauth/access_token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "refresh_token",
-          client_id: SM8_APP_ID,
-          client_secret: SM8_APP_SECRET,
-          refresh_token: refresh_token,
-        }),
-      });
-      const refreshData = await refreshRes.json();
-      if (!refreshRes.ok) {
-        return new Response(JSON.stringify({ error: "Token refresh failed", details: refreshData }), { status: 500, headers: corsHeaders });
-      }
-      access_token = refreshData.access_token;
-      refresh_token = refreshData.refresh_token || refresh_token;
-
-      await fetch(`${SUPABASE_URL}/rest/v1/sm8_tokens`, {
-        method: "POST",
-        headers: { ...sbHeaders(), "Prefer": "resolution=merge-duplicates" },
-        body: JSON.stringify({
-          id: 1,
-          access_token,
-          refresh_token,
-          expires_at: new Date(Date.now() + (refreshData.expires_in || 3600) * 1000).toISOString(),
-        }),
-      });
-    }
-
-    // 3. Look up job by generated_job_id
-    const jobLookupRes = await fetch(
-      `https://api.servicem8.com/api_1.0/job.json?$filter=generated_job_id eq '${jobNumber}'`,
-      { headers: { Authorization: `Bearer ${access_token}` } }
-    );
-    const jobs = await jobLookupRes.json();
-    if (!jobLookupRes.ok) {
-      return new Response(JSON.stringify({ error: "Job lookup failed", details: jobs }), { status: 500, headers: corsHeaders });
-    }
-    if (!Array.isArray(jobs) || jobs.length === 0) {
-      return new Response(JSON.stringify({ error: `No ServiceM8 job found matching "${jobNumber}"` }), { status: 404, headers: corsHeaders });
-    }
-    const jobUuid = jobs[0].uuid;
-
-    // 4. Check if we already have a running note for this job
-    const existingRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/sm8_allocation_notes?job_number=eq.${encodeURIComponent(jobNumber)}&select=*`,
-      { headers: { "apikey": SERVICE_ROLE_KEY, "Authorization": `Bearer ${SERVICE_ROLE_KEY}` } }
-    );
-    const existingRows = await existingRes.json();
-    const existing = existingRows && existingRows[0];
-
-    const newLineBlock = lines.map((l: string) => "• " + l).join("\n");
-    const today = new Date().toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
-
-    if (existing && existing.note_uuid) {
-      // Try to append to the existing note
-      const updatedBody = existing.note_body + "\n" + newLineBlock;
-
-      const updateRes = await fetch(`https://api.servicem8.com/api_1.0/note/${existing.note_uuid}.json`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${access_token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ note: updatedBody }),
-      });
-
-      if (updateRes.ok) {
-        await fetch(`${SUPABASE_URL}/rest/v1/sm8_allocation_notes?job_number=eq.${encodeURIComponent(jobNumber)}`, {
-          method: "PATCH",
-          headers: sbHeaders(),
-          body: JSON.stringify({ note_body: updatedBody }),
-        });
-        return new Response(JSON.stringify({ success: true, mode: "updated" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      // If update failed (e.g. note was deleted in ServiceM8), fall through and create a new one
-    }
-
-    // 5. Create a new note
-    const header = "📦 Stock Allocation — " + jobNumber + " (" + today + ")";
-    const fullBody = header + "\n" + newLineBlock;
-
-    const noteRes = await fetch("https://api.servicem8.com/api_1.0/note.json", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${access_token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ related_object: "job", related_object_uuid: jobUuid, note: fullBody }),
-    });
-
-    if (!noteRes.ok) {
-      const errText = await noteRes.text();
-      return new Response(JSON.stringify({ error: "Note creation failed", details: errText }), { status: 500, headers: corsHeaders });
-    }
-
-    const newNoteUuid = noteRes.headers.get("x-record-uuid");
-
-    await fetch(`${SUPABASE_URL}/rest/v1/sm8_allocation_notes`, {
-      method: "POST",
-      headers: { ...sbHeaders(), "Prefer": "resolution=merge-duplicates" },
-      body: JSON.stringify({ job_number: jobNumber, note_uuid: newNoteUuid, note_body: fullBody }),
-    });
-
-    return new Response(JSON.stringify({ success: true, mode: "created" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders });
+  } catch (e) {
+    console.error('ServiceM8 note failed:', e);
   }
-});
-  
+}
+
+async function saveAllocation(a) {
+  showSync();
+  await sbFetch('/rest/v1/allocations', {
+    method: 'POST',
+    headers: { 'Prefer': 'resolution=merge-duplicates' },
+    body: JSON.stringify({ id: a.id, job: a.job, material_id: a.matId, material_name: a.matName, color_name: a.colorName, color_hex: a.colorHex, qty: a.qty, qty_fulfilled: a.qtyFulfilled, note: a.note, staff: a.staff, created_at: a.createdAt })
+  });
+  hideSync();
+}
+
+async function updateAllocationFulfilled(id, qtyFulfilled) {
+  showSync();
+  await sbFetch('/rest/v1/allocations?id=eq.' + id, {
+    method: 'PATCH',
+    body: JSON.stringify({ qty_fulfilled: qtyFulfilled })
+  });
+  hideSync();
+}
+
+async function deleteAllocationDB(id) {
+  showSync();
+  await sbFetch('/rest/v1/allocations?id=eq.' + id, { method: 'DELETE' });
+  hideSync();
+}
+
+function showSync() { document.getElementById('sync-indicator').classList.add('show'); }
+function hideSync() { document.getElementById('sync-indicator').classList.remove('show'); }
+
+// ── STAFF ──
+function renderStaffScreen() {
+  var g = document.getElementById('staff-grid');
+  var btns = staffList.map(function(s) {
+    return '<button class="staff-btn" onclick="selectStaff(\'' + s.replace(/'/g, "\\'") + '\')"><i class="ti ti-user"></i>' + s + '</button>';
+  }).join('');
+  if (!btns) btns = '<p style="color:var(--muted);font-size:13px;grid-column:span 2;text-align:center;">No staff yet — add a name below.</p>';
+  g.innerHTML = btns;
+}
+
+function selectStaff(name) {
+  activeStaff = name;
+  document.getElementById('screen-staff').classList.add('hidden');
+  document.getElementById('screen-main').classList.remove('hidden');
+  document.getElementById('header-staff').innerHTML = '<div class="staff-banner"><i class="ti ti-user" style="color:white;font-size:18px;"></i><div><div class="name">' + name + '</div></div><button class="logout-btn" onclick="logoutStaff()"><i class="ti ti-logout"></i> Switch</button></div>';
+  render();
+}
+
+function logoutStaff() {
+  activeStaff = ''; activeJob = '';
+  document.getElementById('screen-main').classList.add('hidden');
+  document.getElementById('screen-staff').classList.remove('hidden');
+  document.getElementById('header-staff').innerHTML = '';
+  renderStaffScreen();
+}
+
+async function addStaff() {
+  var val = document.getElementById('new-staff').value.trim();
+  if (!val) return;
+  if (staffList.indexOf(val) >= 0) { alert('Already exists.'); return; }
+  staffList.push(val);
+  document.getElementById('new-staff').value = '';
+  renderStaffTags(); renderStaffScreen();
+  try { await saveStaff(val); } catch(e) { alert('Error saving staff: ' + e.message); }
+}
+
+async function removeStaff(name) {
+  staffList = staffList.filter(function(s){ return s !== name; });
+  renderStaffTags(); renderStaffScreen();
+  try { await deleteStaffDB(name); } catch(e) { console.error(e); }
+}
+
+function renderStaffTags() {
+  var el = document.getElementById('staff-tag-list');
+  if (!staffList.length) { el.innerHTML = '<span style="font-size:13px;color:var(--muted);">No staff added yet.</span>'; return; }
+  el.innerHTML = staffList.map(function(s) {
+    return '<span class="staff-tag"><i class="ti ti-user" style="font-size:14px;"></i>' + s + '<button onclick="removeStaff(\'' + s.replace(/'/g, "\\'") + '\')" title="Remove">&#215;</button></span>';
+  }).join('');
+}
+
+async function quickAddStaff() {
+  var val = document.getElementById('quick-staff-input').value.trim();
+  if (!val) { alert('Please enter a name.'); return; }
+  if (staffList.indexOf(val) < 0) {
+    staffList.push(val);
+    try { await saveStaff(val); } catch(e) { alert('Error: ' + e.message); return; }
+  }
+  document.getElementById('quick-staff-input').value = '';
+  renderStaffScreen();
+  selectStaff(val);
+}
+
+// ── JOB ──
+function setJob() {
+  var val = document.getElementById('job-input').value.trim();
+  if (!val) { alert('Please enter a job number.'); return; }
+  activeJob = val; renderJobBanner();
+}
+function clearJob() { activeJob = ''; document.getElementById('job-input').value = ''; renderJobBanner(); }
+function renderJobBanner() {
+  var bw = document.getElementById('job-banner-wrap'), sw = document.getElementById('job-set-wrap');
+  if (activeJob) {
+    bw.innerHTML = '<div class="job-banner"><i class="ti ti-briefcase job-icon"></i><div><small>Active job</small><strong>' + activeJob + '</strong></div><button class="change-btn" onclick="clearJob()">Change</button></div>';
+    sw.classList.add('hidden');
+  } else { bw.innerHTML = ''; sw.classList.remove('hidden'); }
+}
+
+// ── PHOTO ──
+function compressImageFile(file, maxSize, quality) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      compressImage(e.target.result, maxSize, quality, resolve);
+    };
+    reader.readAsDataURL(file instanceof File ? file : new File([file], 'photo.jpg'));
+  });
+}
+
+function compressImage(dataUrl, maxSize, quality, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
+function previewPhoto(input, previewId) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    compressImage(e.target.result, 600, 0.8, function(compressed) {
+      var img = document.getElementById(previewId);
+      img.src = compressed; img.style.display = 'block';
+      input._file = file;
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── COLOUR ROWS ──
+function addColorRow(cid, hex, name, qty, tracked) {
+  hex = hex || '#888888'; name = name || ''; qty = qty || 0;
+  tracked = tracked !== false; // default true
+  var div = document.createElement('div'); div.className = 'color-row';
+  div.innerHTML = '<input type="color" value="' + hex + '" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" placeholder="Colour name" value="' + name + '" style="flex:1;"><input type="number" min="0" value="' + qty + '" style="width:70px;"><label style="display:flex;align-items:center;gap:4px;font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-2);cursor:pointer;white-space:nowrap;margin:0;flex-shrink:0;"><input type="checkbox" class="track-toggle"' + (tracked?' checked':'') + ' style="width:auto;padding:0;border:none;box-shadow:none;margin:0;cursor:pointer;"> Track</label><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button>';
+  document.getElementById(cid).appendChild(div);
+}
+
+function getColorRows(cid) {
+  return Array.from(document.querySelectorAll('#' + cid + ' .color-row')).map(function(row) {
+    var i = row.querySelectorAll('input');
+    var trackEl = row.querySelector('.track-toggle');
+    return { hex: i[0].value, name: i[1].value.trim(), qty: parseInt(i[2].value) || 0, tracked: trackEl ? trackEl.checked : true };
+  }).filter(function(c) { return c.name; });
+}
+
+// ── MATERIALS ──
+function genId() { return 'M' + Date.now().toString(36) + Math.random().toString(36).slice(2,5).toUpperCase(); }
+function totalQty(m) { return m.colors.reduce(function(s,c){ return s+c.qty; }, 0); }
+function trackedQty(m) { return m.colors.filter(function(c){ return c.tracked !== false; }).reduce(function(s,c){ return s+c.qty; }, 0); }
+function stockClass(m) { var t=trackedQty(m); var hasTracked=m.colors.some(function(c){return c.tracked!==false;}); if(!hasTracked) return 'pill-ok'; return t===0?'pill-zero':t<=m.threshold?'pill-low':'pill-ok'; }
+function stockLabel(m) { var t=trackedQty(m); var tot=totalQty(m); var hasTracked=m.colors.some(function(c){return c.tracked!==false;}); if(!hasTracked) return tot+' in stock'; return t===0?'Out of stock':t<=m.threshold?'Low — '+t+' left':t+' in stock'; }
+function fmtDate(ts) { var d=new Date(ts); return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}); }
+
+async function addMaterial() {
+  var name = document.getElementById('new-name').value.trim();
+  var sku = document.getElementById('new-sku').value.trim();
+  var threshold = parseInt(document.getElementById('new-threshold').value) || 5;
+  if (!name) { alert('Please enter a material name.'); return; }
+  var colors = getColorRows('color-entries');
+  if (!colors.length) colors = [{ hex:'#888888', name:'Standard', qty:0 }];
+  var id = genId();
+  var maxOrder = materials.reduce(function(mx,x){ return Math.max(mx, x.sortOrder||0); }, 0);
+  var m = { id: id, name: name, sku: sku, threshold: threshold, colors: colors, photo: null, createdAt: Date.now(), sortOrder: maxOrder + 1000 };
+  // Upload photo if selected
+  var photoInput = document.getElementById('new-photo-input');
+  if (photoInput._file) {
+    try { m.photo = await uploadPhoto(photoInput._file, id); } catch(e) { console.error('Photo upload failed:', e); }
+  }
+  materials.push(m);
+  try {
+    await saveMaterial(m);
+  } catch(e) { alert('Error saving material: ' + e.message); return; }
+  // Reset form
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-sku').value = '';
+  document.getElementById('new-threshold').value = '5';
+  document.getElementById('color-entries').innerHTML = '';
+  photoInput.value = ''; photoInput._file = null;
+  document.getElementById('new-photo-preview').style.display = 'none';
+  render();
+}
+
+async function duplicateMaterial(id) {
+  var src = materials.find(function(x){ return x.id===id; }); if (!src) return;
+  var newId = genId();
+  var idx = materials.findIndex(function(x){ return x.id===id; });
+  var nextOrder = idx + 1 < materials.length ? (materials[idx+1].sortOrder || 0) : (src.sortOrder || 0) + 2000;
+  var cloneOrder = Math.round(((src.sortOrder || 0) + nextOrder) / 2);
+  var clone = { id: newId, name: src.name+' (copy)', sku: src.sku ? src.sku+'-B' : '', threshold: src.threshold, colors: src.colors.map(function(c){ return {hex:c.hex,name:c.name,qty:0}; }), photo: src.photo || null, createdAt: Date.now(), sortOrder: cloneOrder };
+  materials.splice(idx+1, 0, clone);
+  try { await saveMaterial(clone); } catch(e) { alert('Error: ' + e.message); return; }
+  render();
+  setTimeout(function(){ showEdit(clone.id, true); }, 100);
+}
+
+async function deleteMaterial(id) {
+  if (!confirm('Delete this material?')) return;
+  materials = materials.filter(function(m){ return m.id!==id; });
+  render();
+  try { await deleteMaterialDB(id); } catch(e) { console.error(e); }
+}
+
+// ── RENDER ──
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('tab-'+v).classList.add('active');
+}
+
+function render() {
+  renderJobBanner();
+  renderAdminStats();
+  renderAdminList();
+  renderTradesmanList();
+  renderTransactions();
+  renderStaffTags();
+  renderAllocations();
+  populateAllocMaterials();
+}
+
+function renderAdminStats() {
+  var total=materials.length, low=0, out=0;
+  materials.forEach(function(m){
+    var hasTracked = m.colors.some(function(c){ return c.tracked !== false; });
+    if (!hasTracked) return;
+    var t=trackedQty(m);
+    if(t===0) out++; else if(t<=m.threshold) low++;
+  });
+  var lowActive = stockFilter==='low' ? 'outline:3px solid var(--warning);' : '';
+  var outActive = stockFilter==='out' ? 'outline:3px solid var(--danger);' : '';
+  var allActive = stockFilter===null ? 'outline:3px solid var(--green);' : '';
+  document.getElementById('admin-stats').innerHTML=
+    '<div class="stat" style="cursor:pointer;'+allActive+'" onclick="setStockFilter(null)" title="Show all"><div class="stat-n green">'+total+'</div><div class="stat-l">Materials</div></div>'+
+    '<div class="stat" style="cursor:pointer;'+lowActive+'" onclick="setStockFilter(\'low\')" title="Show low stock"><div class="stat-n warn">'+low+'</div><div class="stat-l">Low stock</div></div>'+
+    '<div class="stat" style="cursor:pointer;'+outActive+'" onclick="setStockFilter(\'out\')" title="Show out of stock"><div class="stat-n red">'+out+'</div><div class="stat-l">Out of stock</div></div>';
+}
+
+function setStockFilter(f) {
+  stockFilter = stockFilter === f ? null : f;
+  document.getElementById('admin-search').value = '';
+  renderAdminStats();
+  renderAdminList();
+}
+
+function getFilteredMaterials(searchId) {
+  var q = (document.getElementById(searchId) ? document.getElementById(searchId).value : '').toLowerCase().trim();
+  if (!q) return materials;
+  return materials.filter(function(m){ return m.name.toLowerCase().includes(q) || (m.sku||'').toLowerCase().includes(q); });
+}
+
+function thumbHtml(m) {
+  if (m.photo) return '<div class="mat-thumb"><img src="' + m.photo + '" alt="" loading="lazy"></div>';
+  return '<div class="mat-thumb"><i class="ti ti-package"></i></div>';
+}
+
+var dragSrcId = null;
+var autoScrollInterval = null;
+
+function startAutoScroll(e) {
+  stopAutoScroll();
+  var zone = 80; // px from edge to trigger scroll
+  var speed = 12;
+  autoScrollInterval = setInterval(function() {
+    var y = e.clientY;
+    if (y < zone) {
+      window.scrollBy(0, -speed);
+    } else if (y > window.innerHeight - zone) {
+      window.scrollBy(0, speed);
+    }
+  }, 16);
+}
+
+function stopAutoScroll() {
+  if (autoScrollInterval) { clearInterval(autoScrollInterval); autoScrollInterval = null; }
+}
+
+function renderAdminList() {
+  var el = document.getElementById('admin-list');
+  var list = getFilteredMaterials('admin-search');
+  if (stockFilter === 'low') list = list.filter(function(m){ var t=trackedQty(m); return t>0 && t<=m.threshold; });
+  if (stockFilter === 'out') list = list.filter(function(m){ return m.colors.some(function(c){return c.tracked!==false;}) && trackedQty(m)===0; });
+  if (!list.length) { el.innerHTML = '<div class="no-items">'+(stockFilter?'No materials match this filter.':'No materials found.')+'</div>'; return; }
+  var searching = (document.getElementById('admin-search').value || '').trim().length > 0 || stockFilter !== null;
+  var h = '';
+  list.forEach(function(m) {
+    h += '<div class="mat-item" draggable="' + (!searching) + '" data-id="'+m.id+'" style="' + (!searching ? 'cursor:grab;' : '') + '">' +
+      (!searching ? '<div style="color:var(--text-3);font-size:20px;padding:0 4px 0 0;cursor:grab;flex-shrink:0;"><i class="ti ti-grip-vertical"></i></div>' : '') +
+      thumbHtml(m) +
+      '<div style="flex:1;min-width:0;"><div class="mat-name">'+m.name+'</div><div class="mat-meta">'+(m.sku?'SKU: '+m.sku+' &middot; ':'')+m.colors.length+' colour'+(m.colors.length!==1?'s':'')+'</div><div class="color-dots">'+m.colors.map(function(c){ return '<span class="cdot" style="background:'+c.hex+'" data-tip="'+c.name+': '+c.qty+'"></span>'; }).join('')+'</div></div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><span class="stock-pill '+stockClass(m)+'">'+stockLabel(m)+'</span><div class="item-btns"><button class="btn sm clone" data-action="dup" data-id="'+m.id+'" title="Duplicate"><i class="ti ti-copy"></i> <span>Dup</span></button><button class="btn sm" data-action="qr" data-id="'+m.id+'" title="QR"><i class="ti ti-qrcode"></i></button><button class="btn sm" data-action="edit" data-id="'+m.id+'" title="Edit"><i class="ti ti-edit"></i></button><button class="btn sm danger" data-action="del" data-id="'+m.id+'" title="Delete"><i class="ti ti-trash"></i></button></div></div>' +
+      '</div>';
+  });
+  el.innerHTML = h;
+
+  // Button events
+  el.querySelectorAll('[data-action]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var id=btn.getAttribute('data-id'), action=btn.getAttribute('data-action');
+      if(action==='dup') duplicateMaterial(id);
+      else if(action==='qr') showQR(id);
+      else if(action==='edit') showEdit(id, false);
+      else if(action==='del') deleteMaterial(id);
+    });
+  });
+
+  // Drag-and-drop
+  if (!searching) {
+    el.querySelectorAll('.mat-item[draggable]').forEach(function(item) {
+      item.addEventListener('dragstart', function(e) {
+        dragSrcId = item.getAttribute('data-id');
+        item.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+        document.addEventListener('dragover', startAutoScroll);
+      });
+      item.addEventListener('dragend', function() {
+        item.style.opacity = '1';
+        el.querySelectorAll('.mat-item').forEach(function(i){ i.classList.remove('drag-over'); });
+        stopAutoScroll();
+        document.removeEventListener('dragover', startAutoScroll);
+      });
+      item.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        el.querySelectorAll('.mat-item').forEach(function(i){ i.classList.remove('drag-over'); });
+        item.classList.add('drag-over');
+      });
+      item.addEventListener('drop', function(e) {
+        e.preventDefault();
+        var targetId = item.getAttribute('data-id');
+        if (!dragSrcId || dragSrcId === targetId) return;
+        // Reorder in memory
+        var srcIdx = materials.findIndex(function(m){ return m.id === dragSrcId; });
+        var tgtIdx = materials.findIndex(function(m){ return m.id === targetId; });
+        var moved = materials.splice(srcIdx, 1)[0];
+        var newTgt = materials.findIndex(function(m){ return m.id === targetId; });
+        materials.splice(newTgt, 0, moved);
+        // Reassign sort orders
+        materials.forEach(function(m, i){ m.sortOrder = (i + 1) * 1000; });
+        renderAdminList();
+        renderTradesmanList();
+        // Save new order to Supabase
+        saveSortOrder();
+      });
+    });
+  }
+}
+
+async function saveSortOrder() {
+  showSync();
+  try {
+    await Promise.all(materials.map(function(m) {
+      return sbFetch('/rest/v1/materials?id=eq.' + m.id, {
+        method: 'PATCH',
+        body: JSON.stringify({ sort_order: m.sortOrder })
+      });
+    }));
+  } catch(e) { console.error('Sort order save failed:', e); }
+  hideSync();
+}
+
+function renderTradesmanList() {
+  var el = document.getElementById('tradesman-list');
+  var list = getFilteredMaterials('tradesman-search');
+  if (!list.length) { el.innerHTML = '<div class="no-items">No materials found.</div>'; return; }
+  var h = '';
+  list.forEach(function(m) {
+    var jobAllocQty = activeJob ? allocations.filter(function(a){ return a.job===activeJob && a.matId===m.id && a.qtyFulfilled<a.qty; }).reduce(function(s,a){ return s+(a.qty-a.qtyFulfilled); }, 0) : 0;
+    var allocBadge = jobAllocQty > 0 ? '<span class="alloc-pill"><i class="ti ti-clipboard-list" style="font-size:9px;"></i> '+jobAllocQty+' allocated</span>' : '';
+    h += '<div class="mat-item" style="cursor:pointer;" data-action="detail" data-id="'+m.id+'">' + thumbHtml(m) + '<div style="flex:1;min-width:0;"><div class="mat-name">'+m.name+allocBadge+'</div><div class="mat-meta">'+(m.sku?'SKU: '+m.sku+' &middot; ':'')+'Tap to collect / return</div><div class="color-dots">'+m.colors.map(function(c){ return '<span class="cdot" style="background:'+c.hex+'" data-tip="'+c.name+': '+c.qty+'"></span>'; }).join('')+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><span class="stock-pill '+stockClass(m)+'">'+stockLabel(m)+'</span><i class="ti ti-chevron-right" style="color:var(--muted);font-size:18px;"></i></div></div>';
+  });
+  el.innerHTML = h;
+  el.querySelectorAll('[data-action="detail"]').forEach(function(item) {
+    item.addEventListener('click', function(){ showDetail(item.getAttribute('data-id')); });
+  });
+}
+
+function renderTransactions() {
+  var el = document.getElementById('tx-list');
+  var recent = transactions.slice(0, 25);
+  if (!recent.length) { el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0;">No transactions yet.</div>'; return; }
+  el.innerHTML = recent.map(function(tx) {
+    var cls=tx.type==='collect'?'out':'in', icon=tx.type==='collect'?'ti-arrow-up-right':'ti-arrow-down-left', sign=tx.type==='collect'?'-':'+';
+    return '<div class="tx-row"><i class="ti '+icon+' tx-icon '+cls+'"></i><div class="tx-info"><span class="tx-mat">'+tx.matName+'</span> <span class="tx-col">— '+tx.colorName+'</span><br>'+(tx.job?'<span class="tx-tag">'+tx.job+'</span>':'')+(tx.staff?'<span class="tx-tag staff"><i class="ti ti-user" style="font-size:10px"></i> '+tx.staff+'</span>':'')+'</div><span class="tx-qty '+cls+'">'+sign+tx.qty+'</span><span class="tx-time">'+fmtDate(tx.ts)+'</span></div>';
+  }).join('');
+}
+
+// ── DETAIL MODAL ──
+function showDetail(id) {
+  var m = materials.find(function(x){ return x.id===id; }); if (!m) return;
+  var jobWarn = !activeJob ? '<div class="warn-box"><i class="ti ti-alert-triangle"></i> No active job set — enter a job number first.</div>' : '';
+  var jobBadge = activeJob ? '<div style="margin-bottom:10px;"><span class="tx-tag" style="font-size:13px;padding:5px 12px;">'+activeJob+'</span> <span class="tx-tag staff" style="font-size:13px;padding:5px 12px;"><i class="ti ti-user" style="font-size:12px;margin-right:3px;"></i>'+activeStaff+'</span></div>' : '';
+  var photoHtml = m.photo ? '<img src="'+m.photo+'" class="detail-photo" alt="'+m.name+'">' : '';
+  // Check if there are allocations for this job+material
+  var jobAllocs = activeJob ? allocations.filter(function(a){ return a.job===activeJob && a.matId===id && a.qtyFulfilled < a.qty; }) : [];
+  var allocBanner = '';
+  if (jobAllocs.length) {
+    var allocLines = jobAllocs.map(function(a){
+      return '<div style="display:flex;align-items:center;gap:6px;font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.15);"><span style="width:14px;height:14px;border-radius:50%;background:'+a.colorHex+';border:1.5px solid rgba(0,0,0,0.2);flex-shrink:0;"></span><span style="color:white;font-weight:600;">'+a.colorName+'</span><span style="color:rgba(255,255,255,0.7);"> — '+(a.qty-a.qtyFulfilled)+' allocated</span>'+(a.note?'<span style="color:rgba(255,255,255,0.5);font-style:italic;font-size:11px;">'+a.note+'</span>':'')+'</div>';
+    }).join('');
+    allocBanner = '<div class="alloc-banner"><h3><i class="ti ti-clipboard-list"></i> Allocated for this job</h3>'+allocLines+'<p style="margin-top:8px;">Tap Collect on a colour below to fulfil these allocations.</p></div>';
+  }
+  var rows = '';
+  m.colors.forEach(function(c,i) {
+    var colorAllocs = allocations.filter(function(a){ return a.matId===id && a.colorName===c.name && a.qtyFulfilled < a.qty; });
+    var reserved = colorAllocs.reduce(function(sum,a){ return sum + (a.qty - a.qtyFulfilled); }, 0);
+    var available = Math.max(0, c.qty - reserved);
+    var reservedBadge = '';
+    if (colorAllocs.length) {
+      var jobLines = colorAllocs.map(function(a){
+        return '<span class="reserved-bar" style="margin-top:3px;"><i class="ti ti-lock" style="font-size:9px;"></i> '+(a.qty-a.qtyFulfilled)+' reserved for job '+a.job+'</span>';
+      }).join('');
+      reservedBadge = '<div style="display:flex;flex-direction:column;gap:2px;">'+jobLines+'</div>';
+    }
+    rows += '<div class="cstock-row"><div class="cswatch"><span class="cswatch-dot" style="background:'+c.hex+'"></span><div><div class="cname">'+c.name+'</div><div class="cqty-label" id="ql-'+id+'-'+i+'">'+c.qty+' in stock</div>'+reservedBadge+'</div></div><div class="cactions"><div class="cbtns"><button class="btn sm danger" data-mat="'+id+'" data-ci="'+i+'" data-type="collect"><i class="ti ti-arrow-up-right"></i> Collect</button><button class="btn sm success" data-mat="'+id+'" data-ci="'+i+'" data-type="return"><i class="ti ti-arrow-down-left"></i> Return</button></div><div class="qty-row"><label>Qty:</label><input type="number" id="qi-'+id+'-'+i+'" value="1" min="1"></div></div></div>';
+  });
+  var el = document.getElementById('modal-detail-content');
+  el.innerHTML = '<div class="detail-name">'+m.name+'</div>'+(m.sku?'<div class="detail-sku">SKU: '+m.sku+'</div>':'<div style="margin-bottom:10px;"></div>')+photoHtml+jobWarn+jobBadge+allocBanner+rows+'<p style="margin-top:12px;font-size:12px;color:var(--muted);">Set quantity then tap Collect or Return.</p>';
+  el.querySelectorAll('[data-mat]').forEach(function(btn) {
+    btn.addEventListener('click', function(){ adjustStock(btn.getAttribute('data-mat'), parseInt(btn.getAttribute('data-ci')), btn.getAttribute('data-type')); });
+  });
+  document.getElementById('modal-detail').classList.remove('hidden');
+}
+
+async function adjustStock(matId, colorIdx, type) {
+  if (!activeJob) { alert('Please set a job number first.'); return; }
+  var m = materials.find(function(x){ return x.id===matId; }); if (!m) return;
+  var c = m.colors[colorIdx];
+  var qty = parseInt(document.getElementById('qi-'+matId+'-'+colorIdx).value) || 1;
+  if (type==='collect') { if(c.qty<=0){ alert('None in stock.'); return; } if(qty>c.qty){ alert('Only '+c.qty+' in stock.'); return; } c.qty=Math.max(0,c.qty-qty); }
+  else { c.qty += qty; }
+  var tx = { id: genId(), ts: Date.now(), matId: matId, matName: m.name, colorName: c.name, type: type, qty: qty, job: activeJob, staff: activeStaff };
+  transactions.unshift(tx);
+  document.getElementById('ql-'+matId+'-'+colorIdx).textContent = c.qty + ' in stock';
+  // Auto-fulfil matching allocation if collecting
+  var allocUpdates = [];
+  if (type === 'collect') {
+    var remaining = qty;
+    allocations.forEach(function(a) {
+      if (remaining <= 0) return;
+      if (a.job === activeJob && a.matId === matId && a.colorName === c.name && a.qtyFulfilled < a.qty) {
+        var canFulfil = Math.min(remaining, a.qty - a.qtyFulfilled);
+        a.qtyFulfilled += canFulfil;
+        remaining -= canFulfil;
+        allocUpdates.push(updateAllocationFulfilled(a.id, a.qtyFulfilled));
+      }
+    });
+  }
+  renderAdminStats(); renderAdminList(); renderTradesmanList(); renderTransactions(); renderAllocations();
+  try {
+    await Promise.all([ saveMaterial(m), saveTransaction(tx) ].concat(allocUpdates));
+  } catch(e) { console.error('Save error:', e); }
+}
+
+// ── ALLOCATIONS ──
+function getAllocatedQty(matId, colorName) {
+  return allocations.reduce(function(sum, a) {
+    if (a.matId === matId && a.colorName === colorName) {
+      return sum + Math.max(0, a.qty - a.qtyFulfilled);
+    }
+    return sum;
+  }, 0);
+}
+
+function populateAllocMaterials() {
+  var sel = document.getElementById('alloc-material'); if (!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">— Select material —</option>' +
+    materials.map(function(m){ return '<option value="'+m.id+'"'+(m.id===cur?' selected':'')+'>'+m.name+'</option>'; }).join('');
+  if (cur) populateAllocColours();
+}
+
+function populateAllocColours() {
+  var matSel = document.getElementById('alloc-material');
+  var colSel = document.getElementById('alloc-colour');
+  if (!matSel || !colSel) return;
+  var m = materials.find(function(x){ return x.id === matSel.value; });
+  if (!m) { colSel.innerHTML = '<option value="">— Select colour —</option>'; return; }
+  colSel.innerHTML = '<option value="">— Select colour —</option>' +
+    m.colors.map(function(c){ return '<option value="'+c.name+'" data-hex="'+c.hex+'">'+c.name+' ('+c.qty+' in stock)</option>'; }).join('');
+}
+
+var allocBatch = [];
+
+function addToAllocBatch() {
+  var job = document.getElementById('alloc-job').value.trim();
+  var matId = document.getElementById('alloc-material').value;
+  var colorName = document.getElementById('alloc-colour').value;
+  var qty = parseInt(document.getElementById('alloc-qty').value) || 1;
+  var note = document.getElementById('alloc-note').value.trim();
+  if (!job) { alert('Please enter a job number.'); return; }
+  if (!matId) { alert('Please select a material.'); return; }
+  if (!colorName) { alert('Please select a colour.'); return; }
+  if (allocBatch.length && allocBatch[0].job !== job) {
+    if (!confirm('Your batch has items for job "' + allocBatch[0].job + '". Clear batch and start a new one for "' + job + '"?')) return;
+    allocBatch = [];
+  }
+  var m = materials.find(function(x){ return x.id === matId; });
+  if (!m) return;
+  var colSel = document.getElementById('alloc-colour');
+  var selectedOpt = colSel.options[colSel.selectedIndex];
+  var colorHex = selectedOpt ? (selectedOpt.getAttribute('data-hex') || '#888888') : '#888888';
+  allocBatch.push({ id: genId(), job: job, matId: matId, matName: m.name, colorName: colorName, colorHex: colorHex, qty: qty, qtyFulfilled: 0, note: note, staff: activeStaff, createdAt: Date.now() });
+  document.getElementById('alloc-note').value = '';
+  document.getElementById('alloc-qty').value = '1';
+  renderAllocBatch();
+}
+
+function removeFromAllocBatch(id) {
+  allocBatch = allocBatch.filter(function(x){ return x.id !== id; });
+  renderAllocBatch();
+}
+
+function renderAllocBatch() {
+  var el = document.getElementById('alloc-batch-list');
+  var submitRow = document.getElementById('alloc-batch-submit-row');
+  if (!allocBatch.length) {
+    el.innerHTML = '';
+    submitRow.classList.add('hidden');
+    return;
+  }
+  var h = '<div style="font-size:12px;font-weight:700;color:var(--text-3);margin-bottom:6px;">JOB MATERIALS — ' + allocBatch[0].job + '</div>';
+  allocBatch.forEach(function(a) {
+    h += '<div class="alloc-line"><div class="alloc-line-info"><span class="alloc-swatch" style="background:' + a.colorHex + '"></span><div><span style="font-weight:600;color:var(--text);">' + a.qty + ' x ' + a.matName + '</span><span style="color:var(--text-3);"> — ' + a.colorName + '</span>' + (a.note ? '<div class="alloc-note">' + a.note + '</div>' : '') + '</div></div><button class="btn sm danger" onclick="removeFromAllocBatch(\'' + a.id + '\')" style="padding:5px 8px;"><i class="ti ti-trash"></i></button></div>';
+  });
+  el.innerHTML = h;
+  submitRow.classList.remove('hidden');
+}
+
+async function submitAllocBatch() {
+  if (!allocBatch.length) return;
+  var job = allocBatch[0].job;
+  var toSave = allocBatch.slice();
+  allocations = toSave.concat(allocations);
+  document.getElementById('alloc-job').value = '';
+  allocBatch = [];
+  renderAllocBatch();
+  renderAllocations();
+  renderTradesmanList();
+  try {
+    await Promise.all(toSave.map(function(a) { return saveAllocation(a); }));
+  } catch (e) {
+    alert('Error saving allocation: ' + e.message);
+  }
+  var lines = toSave.map(function(a) {
+    return a.qty + ' x ' + a.matName + ' — ' + a.colorName + (a.note ? ' (' + a.note + ')' : '') + (a.staff ? ' — by ' + a.staff : '');
+  });
+  postAllocationBatchNote(job, lines);
+}
+
+async function deleteAllocation(id) {
+  if (!confirm('Remove this allocation?')) return;
+  allocations = allocations.filter(function(a){ return a.id !== id; });
+  renderAllocations(); renderTradesmanList();
+  try { await deleteAllocationDB(id); } catch(e) { console.error(e); }
+}
+
+async function collectAllocated(allocId) {
+  var a = allocations.find(function(x){ return x.id === allocId; }); if (!a) return;
+  var remaining = a.qty - a.qtyFulfilled;
+  if (remaining <= 0) { alert('Already fully collected.'); return; }
+  var m = materials.find(function(x){ return x.id === a.matId; }); if (!m) return;
+  var ci = m.colors.findIndex(function(c){ return c.name === a.colorName; });
+  if (ci < 0) { alert('Colour not found in stock.'); return; }
+  var c = m.colors[ci];
+  var toCollect = Math.min(remaining, c.qty);
+  if (toCollect <= 0) { alert('None in stock to collect.'); return; }
+  c.qty = Math.max(0, c.qty - toCollect);
+  a.qtyFulfilled += toCollect;
+  var tx = { id: genId(), ts: Date.now(), matId: a.matId, matName: a.matName, colorName: a.colorName, type: 'collect', qty: toCollect, job: a.job, staff: activeStaff };
+  transactions.unshift(tx);
+  renderAllocations(); renderAdminStats(); renderAdminList(); renderTradesmanList(); renderTransactions();
+  try { await Promise.all([ saveMaterial(m), saveTransaction(tx), updateAllocationFulfilled(a.id, a.qtyFulfilled) ]); } catch(e) { console.error(e); }
+  postAllocationBatchNote(a.job, ['✅ Collected: ' + toCollect + ' x ' + a.matName + ' — ' + a.colorName + (a.qtyFulfilled < a.qty ? ' (' + (a.qty - a.qtyFulfilled) + ' remaining)' : ' (fully collected)') + (activeStaff ? ' — by ' + activeStaff : '')]);
+}
+
+function renderAllocations() {
+  var el = document.getElementById('alloc-list'); if (!el) return;
+  var q = (document.getElementById('alloc-search') ? document.getElementById('alloc-search').value : '').toLowerCase().trim();
+  var pending = allocations.filter(function(a){ return a.qtyFulfilled < a.qty; });
+  if (q) pending = pending.filter(function(a){ return a.job.toLowerCase().includes(q) || a.matName.toLowerCase().includes(q); });
+  if (!pending.length) { el.innerHTML = '<div class="no-items">'+(q?'No matching allocations.':'No pending allocations.')+'</div>'; return; }
+  // Group by job
+  var byJob = {};
+  pending.forEach(function(a){
+    if (!byJob[a.job]) byJob[a.job] = [];
+    byJob[a.job].push(a);
+  });
+  var h = '';
+  Object.keys(byJob).forEach(function(job) {
+    var items = byJob[job];
+    h += '<div class="alloc-item"><div class="alloc-item-header"><div class="alloc-job"><i class="ti ti-briefcase"></i>'+job+'</div><span class="alloc-status-badge pending"><i class="ti ti-clock" style="font-size:10px;"></i> '+items.length+' item'+(items.length!==1?'s':'')+'</span></div>';
+    items.forEach(function(a) {
+      var remaining = a.qty - a.qtyFulfilled;
+      var partial = a.qtyFulfilled > 0;
+      h += '<div class="alloc-line"><div class="alloc-line-info"><span class="alloc-swatch" style="background:'+a.colorHex+'"></span><div><span style="font-weight:600;color:var(--text);">'+a.matName+'</span><span style="color:var(--text-3);"> — '+a.colorName+'</span>'+(a.note?'<div class="alloc-note">'+a.note+'</div>':'')+(partial?'<div style="font-size:11px;color:var(--cyan);margin-top:2px;"><i class="ti ti-check" style="font-size:10px;"></i> '+a.qtyFulfilled+' collected</div>':'')+(a.staff?'<div style="font-size:11px;color:var(--text-3);">by '+a.staff+'</div>':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="alloc-qty">'+remaining+' needed</span><button class="collect-alloc-btn" onclick="collectAllocated(\''+a.id+'\')"><i class="ti ti-arrow-up-right"></i> Collect</button><button class="btn sm danger" onclick="deleteAllocation(\''+a.id+'\')" title="Remove allocation" style="padding:5px 8px;"><i class="ti ti-trash"></i></button></div></div>';
+    });
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+// ── QR ──
+function showQR(id) {
+  var m = materials.find(function(x){ return x.id===id; }); if (!m) return;
+  currentQRId = id;
+  document.getElementById('qr-modal-title').innerHTML = '<i class="ti ti-qrcode" style="color:var(--blue)"></i> QR Code';
+  document.getElementById('qr-mat-name').textContent = m.name;
+  document.getElementById('qr-label').textContent = m.sku || m.id;
+  var printPhoto = document.getElementById('qr-print-photo');
+  if (m.photo) { printPhoto.src = m.photo; printPhoto.classList.remove('hidden'); }
+  else { printPhoto.classList.add('hidden'); }
+  var container = document.getElementById('qrcode-container'); container.innerHTML = '';
+  new QRCode(container, { text: 'JSJSTOCK:'+m.id, width: 200, height: 200, colorDark: '#0d52a5', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+  document.getElementById('modal-qr').classList.remove('hidden');
+}
+
+function printQR() { window.print(); }
+
+function downloadQR() {
+  var canvas = document.querySelector('#qrcode-container canvas'); if (!canvas) return;
+  var m = materials.find(function(x){ return x.id===currentQRId; });
+  var a = document.createElement('a');
+  a.download = 'qr-'+(m?m.name.replace(/[^a-z0-9]/gi,'-').toLowerCase():currentQRId)+'.png';
+  a.href = canvas.toDataURL(); a.click();
+}
+
+// ── EDIT ──
+function showEdit(id, isClone) {
+  var m = materials.find(function(x){ return x.id===id; }); if (!m) return;
+  editingId = id;
+  document.getElementById('edit-title').innerHTML = isClone ? '<i class="ti ti-copy" style="color:var(--blue)"></i> Edit Duplicated Material' : '<i class="ti ti-edit" style="color:var(--blue)"></i> Edit Material';
+  var colorRows = m.colors.map(function(c) {
+    var tracked = c.tracked !== false;
+    return '<div class="color-row"><input type="color" value="'+c.hex+'" style="width:34px;height:34px;padding:2px;border-radius:50%;cursor:pointer;border:2px solid var(--border);flex-shrink:0;background:transparent;"><input type="text" value="'+c.name+'" placeholder="Colour name" style="flex:1;"><input type="number" min="0" value="'+c.qty+'" style="width:70px;"><label style="display:flex;align-items:center;gap:4px;font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-2);cursor:pointer;white-space:nowrap;margin:0;flex-shrink:0;"><input type="checkbox" class="track-toggle"'+(tracked?' checked':'')+' style="width:auto;padding:0;border:none;box-shadow:none;margin:0;cursor:pointer;"> Track</label><button class="rm-btn" onclick="this.parentElement.remove()">&#215;</button></div>';
+  }).join('');
+  var photoPreviewHtml = m.photo ? '<img src="'+m.photo+'" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block;">' : '';
+  document.getElementById('modal-edit-content').innerHTML =
+    (isClone?'<div class="info-box"><i class="ti ti-info-circle"></i> Colours copied — quantities reset. Update name and SKU.</div>':'')+
+    '<div style="margin-bottom:12px;"><label>Material name</label><input type="text" id="edit-name" value="'+m.name+'"></div>'+
+    '<div style="margin-bottom:12px;"><label>SKU / Code</label><input type="text" id="edit-sku" value="'+(m.sku||'')+'"></div>'+
+    '<div style="margin-bottom:12px;"><label>Low stock threshold</label><input type="number" id="edit-threshold" value="'+m.threshold+'" min="0"></div>'+
+    '<div style="margin-bottom:12px;"><label>Material photo</label>'+photoPreviewHtml+
+    '<div class="photo-upload" onclick="document.getElementById(\'edit-photo-input\').click()"><i class="ti ti-camera"></i><p>'+(m.photo?'Tap to replace photo':'Tap to add photo')+'</p><img id="edit-photo-preview" class="photo-preview"></div>'+
+    '<input type="file" id="edit-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="previewPhoto(this,\'edit-photo-preview\')"></div>'+
+    '<label style="margin-bottom:8px;display:block;">Colours &amp; quantities</label>'+
+    '<div id="edit-colors">'+colorRows+'</div>'+
+    '<button class="btn sm" id="add-edit-color-btn" style="margin-top:8px;"><i class="ti ti-plus"></i> Add colour</button>';
+  document.getElementById('add-edit-color-btn').addEventListener('click', function(){ addColorRow('edit-colors'); });
+  document.getElementById('modal-edit').classList.remove('hidden');
+  if (isClone) setTimeout(function(){ var n=document.getElementById('edit-name'); if(n) n.select(); }, 100);
+}
+
+async function saveEdit() {
+  var m = materials.find(function(x){ return x.id===editingId; }); if (!m) return;
+  m.name = document.getElementById('edit-name').value.trim() || m.name;
+  m.sku = document.getElementById('edit-sku').value.trim();
+  m.threshold = parseInt(document.getElementById('edit-threshold').value) || 5;
+  var colors = getColorRows('edit-colors');
+  if (!colors.length) { alert('Add at least one colour.'); return; }
+  m.colors = colors;
+  // Upload new photo if selected
+  var photoInput = document.getElementById('edit-photo-input');
+  if (photoInput && photoInput._file) {
+    try { m.photo = await uploadPhoto(photoInput._file, m.id); } catch(e) { console.error('Photo upload failed:', e); }
+  }
+  closeModal('modal-edit');
+  render();
+  try { await saveMaterial(m); } catch(e) { alert('Error saving: ' + e.message); }
+}
+
+// ── CSV ──
+function exportCSV() {
+  if (!transactions.length) { alert('No transactions yet.'); return; }
+  var rows = [['Date','Time','Staff','Job Number','Material','SKU','Colour','Type','Quantity']];
+  var mMap = {};
+  materials.forEach(function(m){ mMap[m.id] = m.sku||''; });
+  transactions.forEach(function(tx) {
+    var d = new Date(tx.ts);
+    rows.push([d.toLocaleDateString('en-AU'), d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}), tx.staff||'', tx.job||'', tx.matName, mMap[tx.matId]||'', tx.colorName, tx.type==='collect'?'Collect':'Return', tx.qty]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'jsj-stock-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// ── INIT ──
+document.getElementById('add-color-new-btn').addEventListener('click', function(){ addColorRow('color-entries'); });
+
+async function init() {
+  var overlay = document.getElementById('loading-overlay');
+  overlay.style.display = 'flex';
+  try {
+    await loadAll();
+    if (materials.length === 0) {
+      for (var i = 0; i < SEED_MATERIALS.length; i++) {
+        await saveMaterial(SEED_MATERIALS[i]);
+      }
+      await loadAll();
+    }
+    overlay.style.display = 'none';
+    renderStaffScreen();
+  } catch(e) {
+    console.error('Load error:', e);
+    overlay.innerHTML = '<div style="text-align:center;padding:20px;max-width:400px;">' +
+      '<div style="font-size:48px;margin-bottom:16px;">⚠️</div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:700;color:#dc2626;margin-bottom:12px;">Connection Failed</div>' +
+      '<div style="font-size:14px;color:#4a5568;margin-bottom:16px;">Could not connect to the database.</div>' +
+      '<div style="background:#fee2e2;border-radius:8px;padding:12px;font-size:12px;color:#b91c1c;text-align:left;margin-bottom:16px;word-break:break-all;">' + e.message + '</div>' +
+      '<div style="font-size:13px;color:#4a5568;margin-bottom:16px;">Make sure RLS policies are set in Supabase:<br><br>' +
+      '<code style="background:#f3f4f6;padding:4px 8px;border-radius:4px;font-size:11px;">create policy "Allow all" on materials for all using (true) with check (true);</code></div>' +
+      '<button onclick="location.reload()" style="background:#0d52a5;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Try Again</button>' +
+      '</div>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
