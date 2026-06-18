@@ -546,6 +546,18 @@ async function deleteStaffDB(name) {
   hideSync();
 }
 
+async function postAllocationNote(jobNumber, noteText) {
+  try {
+    await fetch('https://bvdcstvrvrdnaqwqwghq.supabase.co/functions/v1/rapid-endpoint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobNumber: jobNumber, noteText: noteText })
+    });
+  } catch (e) {
+    console.error('ServiceM8 note failed:', e);
+  }
+}
+
 async function saveAllocation(a) {
   showSync();
   await sbFetch('/rest/v1/allocations', {
@@ -1066,6 +1078,7 @@ async function createAllocation() {
   renderAllocations();
   renderTradesmanList();
   try { await saveAllocation(a); } catch(e) { alert('Error saving allocation: ' + e.message); }
+  postAllocationNote(job, '📦 Stock Allocated: ' + qty + ' x ' + m.name + ' — ' + colorName + (note ? ' (' + note + ')' : '') + (activeStaff ? ' — by ' + activeStaff : ''));
 }
 
 async function deleteAllocation(id) {
@@ -1091,6 +1104,7 @@ async function collectAllocated(allocId) {
   transactions.unshift(tx);
   renderAllocations(); renderAdminStats(); renderAdminList(); renderTradesmanList(); renderTransactions();
   try { await Promise.all([ saveMaterial(m), saveTransaction(tx), updateAllocationFulfilled(a.id, a.qtyFulfilled) ]); } catch(e) { console.error(e); }
+  postAllocationNote(a.job, '✅ Collected: ' + toCollect + ' x ' + a.matName + ' — ' + a.colorName + (a.qtyFulfilled < a.qty ? ' (' + (a.qty - a.qtyFulfilled) + ' remaining)' : ' (fully collected)') + (activeStaff ? ' — by ' + activeStaff : ''));
 }
 
 function renderAllocations() {
